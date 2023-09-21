@@ -8,4 +8,7 @@ import com.alaska.todoapi.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
+    public User findByPhonenumber(String phonenumber);
+
+    public User findByEmailAddress(String email);
 }

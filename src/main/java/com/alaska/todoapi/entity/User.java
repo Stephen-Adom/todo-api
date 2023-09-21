@@ -6,9 +6,6 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import jakarta.persistence.AttributeOverride;
-import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -20,7 +17,9 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,47 +30,43 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user", uniqueConstraints = {
-        @UniqueConstraint(name = "unique_user_email", columnNames = "email_address"),
-        @UniqueConstraint(name = "unique_user_phone", columnNames = "phone_number")
-})
+@Table(name = "user", uniqueConstraints = @UniqueConstraint(name = "unique_user_email", columnNames = "email_address"))
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+        @Column(name = "first_name")
+        @NotBlank(message = "First name is required")
+        private String firstName;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+        @Column(name = "last_name")
+        @NotBlank(message = "Last name is required")
+        private String lastName;
 
-    @Column(name = "email_address", nullable = false, unique = true)
-    @Email
-    private String emailAddress;
+        @Column(name = "email_address")
+        @NotBlank(message = "Email address is required")
+        @Email(message = "Email address is not valid. Please enter a valid email address")
+        private String emailAddress;
 
-    @Column(name = "phone_number", nullable = true, unique = true)
-    private String phonenumber;
+        @Column(name = "phone_number")
+        private String phonenumber;
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "city", column = @Column(name = "user_city")),
-            @AttributeOverride(name = "zipCode", column = @Column(name = "user_zip_code")),
-            @AttributeOverride(name = "country", column = @Column(name = "user_country"))
-    })
-    private Address address;
+        @Embedded
+        @Valid
+        private Address address;
 
-    @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private Date createdAt;
+        @CreationTimestamp
+        @Temporal(TemporalType.TIMESTAMP)
+        @Column(name = "created_at")
+        private Date createdAt;
 
-    @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at")
-    private Date updatedAt;
+        @UpdateTimestamp
+        @Temporal(TemporalType.TIMESTAMP)
+        @Column(name = "updated_at")
+        private Date updatedAt;
 
-    @OneToMany(mappedBy = "user")
-    List<Todo> todos = new ArrayList<Todo>();
+        @OneToMany(mappedBy = "user")
+        List<Todo> todos = new ArrayList<Todo>();
 }
