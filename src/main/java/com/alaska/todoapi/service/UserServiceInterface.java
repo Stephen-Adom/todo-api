@@ -13,4 +13,8 @@ public interface UserServiceInterface {
     public User saveUser(User user) throws UserExistValidationException;
 
     public User updateUser(Long id, User user) throws UserDoesNotExistException, UserExistValidationException;
+
+    public User getUserById(Long id) throws UserDoesNotExistException;
+
+    public void deleteUserById(Long id) throws UserDoesNotExistException;
 }

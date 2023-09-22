@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.alaska.todoapi.entity.validationInterface.EditUserValidationInterface;
-import com.alaska.todoapi.entity.validationInterface.NewUserValidationInterface;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -24,7 +23,6 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

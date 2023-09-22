@@ -72,6 +72,28 @@ public class UserService implements UserServiceInterface {
         return this.userRepository.save(existingUser);
     }
 
+    @Override
+    public User getUserById(Long id) throws UserDoesNotExistException {
+        Optional<User> user = this.userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new UserDoesNotExistException("User with id " + id + " does not exist");
+        }
+
+        return user.get();
+    }
+
+    @Override
+    public void deleteUserById(Long id) throws UserDoesNotExistException {
+        Optional<User> user = this.userRepository.findById(id);
+
+        if (user.isEmpty()) {
+            throw new UserDoesNotExistException("User with id " + id + " does not exist");
+        }
+
+        this.userRepository.deleteById(id);
+    }
+
     private User createUserPostBody(User user) throws UserExistValidationException {
         if (Objects.isNull(user.getAddress())) {
             throw new UserExistValidationException("User address is not available");
