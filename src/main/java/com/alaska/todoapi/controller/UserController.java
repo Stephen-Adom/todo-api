@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alaska.todoapi.Exception.UserDoesNotExistException;
 import com.alaska.todoapi.Exception.UserExistValidationException;
 import com.alaska.todoapi.Exception.ValidationErrorException;
+import com.alaska.todoapi.customUtils.ResponseBody;
 import com.alaska.todoapi.entity.Todo;
 import com.alaska.todoapi.entity.User;
 import com.alaska.todoapi.entity.validationInterface.EditUserValidationInterface;
@@ -36,10 +38,14 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ResponseBody responseBody;
+
     @GetMapping("/users")
     public ResponseEntity<Map<String, Object>> getAllUsers() {
         List<User> allUsers = this.userService.getAllUsers();
-        return new ResponseEntity<Map<String, Object>>(this.listResponseBody(HttpStatus.OK, allUsers), HttpStatus.OK);
+        return new ResponseEntity<Map<String, Object>>(this.responseBody.listResponseBody(HttpStatus.OK, allUsers),
+                HttpStatus.OK);
     }
 
     @PostMapping("/user")
@@ -56,7 +62,7 @@ public class UserController {
         if (newUser.getTodos() == null) {
             newUser.setTodos(new ArrayList<Todo>());
         }
-        return new ResponseEntity<Map<String, Object>>(this.responseBody(HttpStatus.CREATED, newUser),
+        return new ResponseEntity<Map<String, Object>>(this.responseBody.responseBody(HttpStatus.CREATED, newUser),
                 HttpStatus.CREATED);
     }
 
@@ -71,7 +77,7 @@ public class UserController {
 
         User updatedUser = this.userService.updateUser(id, user);
 
-        return new ResponseEntity<Map<String, Object>>(this.responseBody(HttpStatus.CREATED, updatedUser),
+        return new ResponseEntity<Map<String, Object>>(this.responseBody.responseBody(HttpStatus.CREATED, updatedUser),
                 HttpStatus.CREATED);
     }
 
@@ -80,7 +86,8 @@ public class UserController {
             throws UserDoesNotExistException {
         User user = this.userService.getUserById(id);
 
-        return new ResponseEntity<Map<String, Object>>(this.responseBody(HttpStatus.OK, user), HttpStatus.OK);
+        return new ResponseEntity<Map<String, Object>>(this.responseBody.responseBody(HttpStatus.OK, user),
+                HttpStatus.OK);
     }
 
     @DeleteMapping("/user/{id}/delete")
@@ -92,21 +99,5 @@ public class UserController {
         responseMessage.put("message", "User with id " + id + " has been deleted");
 
         return new ResponseEntity<Map<String, String>>(responseMessage, HttpStatus.OK);
-    }
-
-    private Map<String, Object> listResponseBody(HttpStatus status, List<User> users) {
-        Map<String, Object> body = new HashMap<String, Object>();
-        body.put("status", status);
-        body.put("data", users);
-
-        return body;
-    }
-
-    private Map<String, Object> responseBody(HttpStatus status, User user) {
-        Map<String, Object> body = new HashMap<String, Object>();
-        body.put("status", status);
-        body.put("data", user);
-
-        return body;
     }
 }

@@ -12,6 +12,7 @@ import com.alaska.todoapi.entity.validationInterface.EditUserValidationInterface
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -70,6 +71,6 @@ public class User {
         @Column(name = "updated_at")
         private Date updatedAt;
 
-        @OneToMany(mappedBy = "user")
+        @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
         List<Todo> todos = new ArrayList<Todo>();
 }
