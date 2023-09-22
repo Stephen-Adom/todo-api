@@ -2,11 +2,13 @@ package com.alaska.todoapi.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.alaska.todoapi.Exception.UserDoesNotExistException;
 import com.alaska.todoapi.Exception.UserExistValidationException;
 import com.alaska.todoapi.entity.Address;
 import com.alaska.todoapi.entity.User;
@@ -20,7 +22,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public List<User> getAllUsers() {
-        return this.userRepository.findAll(Sort.by("createdAt").descending());
+        return this.userRepository.findAll(Sort.by("createdAt").ascending());
     }
 
     @Override
@@ -36,8 +38,38 @@ public class UserService implements UserServiceInterface {
                 throw new UserExistValidationException("User with email address already exist");
             }
         }
-
         return this.userRepository.save(this.createUserPostBody(user));
+    }
+
+    @Override
+    public User updateUser(Long id, User user) throws UserDoesNotExistException, UserExistValidationException {
+        Optional<User> userExist = this.userRepository.findById(id);
+
+        if (userExist.isEmpty()) {
+            throw new UserDoesNotExistException("User with id " + id + " does not exist");
+        }
+
+        User existingUser = userExist.get();
+
+        existingUser.setFirstName(user.getFirstName());
+        existingUser.setLastName(user.getLastName());
+
+        if (Objects.nonNull(user.getPhonenumber()) && !"".equals(user.getPhonenumber())) {
+
+            if (this.userRepository.existsByPhonenumber(user.getPhonenumber())) {
+                throw new UserExistValidationException("User with phonenumber already exist");
+            } else {
+                existingUser.setPhonenumber(user.getPhonenumber());
+            }
+        }
+
+        new Address();
+        Address address = Address.builder().city(user.getAddress().getCity()).country(user.getAddress().getCountry())
+                .zipCode(user.getAddress().getZipCode()).build();
+
+        existingUser.setAddress(address);
+
+        return this.userRepository.save(existingUser);
     }
 
     private User createUserPostBody(User user) throws UserExistValidationException {

@@ -4,22 +4,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.alaska.todoapi.Exception.UserDoesNotExistException;
 import com.alaska.todoapi.Exception.UserExistValidationException;
 import com.alaska.todoapi.Exception.ValidationErrorException;
 import com.alaska.todoapi.entity.Todo;
 import com.alaska.todoapi.entity.User;
+import com.alaska.todoapi.entity.validationInterface.EditUserValidationInterface;
 import com.alaska.todoapi.service.UserService;
 
 import jakarta.validation.Valid;
@@ -38,7 +43,8 @@ public class UserController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<Map<String, Object>> saveUser(@Valid @RequestBody User user, BindingResult validationResult)
+    public ResponseEntity<Map<String, Object>> saveUser(
+            @Valid @RequestBody User user, BindingResult validationResult)
             throws ValidationErrorException, UserExistValidationException {
 
         if (validationResult.hasErrors()) {
@@ -51,6 +57,21 @@ public class UserController {
             newUser.setTodos(new ArrayList<Todo>());
         }
         return new ResponseEntity<Map<String, Object>>(this.responseBody(HttpStatus.CREATED, newUser),
+                HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/user/{id}/edit")
+    public ResponseEntity<Map<String, Object>> updateUserInfo(@PathVariable("id") Long id,
+            @Validated(EditUserValidationInterface.class) @RequestBody User user, BindingResult validationResult)
+            throws UserDoesNotExistException, UserExistValidationException, ValidationErrorException {
+
+        if (validationResult.hasErrors()) {
+            throw new ValidationErrorException(validationResult.getFieldErrors());
+        }
+
+        User updatedUser = this.userService.updateUser(id, user);
+
+        return new ResponseEntity<Map<String, Object>>(this.responseBody(HttpStatus.CREATED, updatedUser),
                 HttpStatus.CREATED);
     }
 

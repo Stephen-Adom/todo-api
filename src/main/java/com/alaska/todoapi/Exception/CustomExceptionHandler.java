@@ -8,11 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class ValidationErrorExceptionHandler extends ResponseEntityExceptionHandler {
-
+@ResponseStatus
+public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ValidationErrorException.class)
     public ResponseEntity<ErrorMessage> handleValidationError(ValidationErrorException validationErrorException) {
         List<String> errorList = new ArrayList<String>();
@@ -23,5 +24,23 @@ public class ValidationErrorExceptionHandler extends ResponseEntityExceptionHand
 
         return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.UNPROCESSABLE_ENTITY, errorList),
                 HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(UserExistValidationException.class)
+    public ResponseEntity<ErrorMessage> userExistValidation(UserExistValidationException exception) {
+        List<String> messageList = new ArrayList<String>();
+        messageList.add(exception.getMessage());
+
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.UNPROCESSABLE_ENTITY, messageList),
+                HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(UserDoesNotExistException.class)
+    public ResponseEntity<ErrorMessage> userNotExist(UserDoesNotExistException exception) {
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add(exception.getMessage());
+
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.NOT_FOUND, errorMessages),
+                HttpStatus.NOT_FOUND);
     }
 }
