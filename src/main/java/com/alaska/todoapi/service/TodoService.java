@@ -90,4 +90,17 @@ public class TodoService implements TodoServiceInterface {
 
         return existTodo.get();
     }
+
+    @Override
+    public void deleteTodoById(Long userId, Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {
+        if (!this.userRepository.existsById(userId)) {
+            throw new UserDoesNotExistException("User with the id " + userId + " does not exist");
+        }
+
+        if (!this.todoRepository.existsById(todoId)) {
+            throw new TodoDoesNotExistException("Todo with id " + todoId + " does not exist");
+        }
+
+        this.todoRepository.deleteById(todoId);
+    }
 }

@@ -1,13 +1,14 @@
 package com.alaska.todoapi.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,5 +83,17 @@ public class TodoController {
 
         return new ResponseEntity<Map<String, Object>>(this.responseBody.todoResponseBody(HttpStatus.OK, todo),
                 HttpStatus.OK);
+    }
+
+    @DeleteMapping("/user/{userId}/todo/{id}/delete")
+    public ResponseEntity<Map<String, String>> deleteTodoById(@PathVariable("userId") Long userId,
+            @PathVariable("id") Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {
+        this.todoService.deleteTodoById(userId, todoId);
+
+        Map<String, String> responseMessage = new HashMap<String, String>();
+        responseMessage.put("status", HttpStatus.OK.toString());
+        responseMessage.put("message", "Todo with id " + todoId + " has been deleted");
+
+        return new ResponseEntity<Map<String, String>>(responseMessage, HttpStatus.OK);
     }
 }
