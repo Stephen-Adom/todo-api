@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ import com.alaska.todoapi.Exception.UserDoesNotExistException;
 import com.alaska.todoapi.Exception.UserExistValidationException;
 import com.alaska.todoapi.Exception.ValidationErrorException;
 import com.alaska.todoapi.customUtils.ResponseBody;
-import com.alaska.todoapi.entity.Todo;
 import com.alaska.todoapi.entity.User;
 import com.alaska.todoapi.entity.validationInterface.EditUserValidationInterface;
 import com.alaska.todoapi.service.UserService;
@@ -59,9 +57,6 @@ public class UserController {
 
         User newUser = this.userService.saveUser(user);
 
-        if (newUser.getTodos() == null) {
-            newUser.setTodos(new ArrayList<Todo>());
-        }
         return new ResponseEntity<Map<String, Object>>(this.responseBody.responseBody(HttpStatus.CREATED, newUser),
                 HttpStatus.CREATED);
     }

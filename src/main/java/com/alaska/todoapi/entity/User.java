@@ -24,9 +24,11 @@ import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -71,6 +73,7 @@ public class User {
         @Column(name = "updated_at")
         private Date updatedAt;
 
-        @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+        @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+        @Getter(AccessLevel.NONE)
         List<Todo> todos = new ArrayList<Todo>();
 }

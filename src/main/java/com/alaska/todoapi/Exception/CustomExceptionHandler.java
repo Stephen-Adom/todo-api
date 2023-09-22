@@ -43,4 +43,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.NOT_FOUND, errorMessages),
                 HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(TodoAlreadyMarkedAsCompletedException.class)
+    public ResponseEntity<ErrorMessage> todoAlreadyCompleted(TodoAlreadyMarkedAsCompletedException exception) {
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add(exception.getMessage());
+
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.UNPROCESSABLE_ENTITY, errorMessages),
+                HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(TodoDoesNotExistException.class)
+    public ResponseEntity<ErrorMessage> todoNotExist(TodoDoesNotExistException exception) {
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add(exception.getMessage());
+
+        return new ResponseEntity<ErrorMessage>(new ErrorMessage(HttpStatus.NOT_FOUND, errorMessages),
+                HttpStatus.NOT_FOUND);
+    }
 }
