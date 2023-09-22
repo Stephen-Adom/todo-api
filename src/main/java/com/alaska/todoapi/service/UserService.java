@@ -26,23 +26,18 @@ public class UserService implements UserServiceInterface {
     @Override
     public User saveUser(User user) throws UserExistValidationException {
         if (Objects.nonNull(user.getPhonenumber()) && !"".equals(user.getPhonenumber())) {
-            User userWithPhoneNumber = this.userRepository.findByPhonenumber(user.getPhonenumber());
-
-            if (Objects.nonNull(userWithPhoneNumber)) {
+            if (this.userRepository.existsByPhonenumber(user.getPhonenumber())) {
                 throw new UserExistValidationException("User with phonenumber already exist");
             }
         }
 
         if (Objects.nonNull(user.getEmailAddress()) && !"".equals(user.getEmailAddress())) {
-            User userWithEmailAddress = this.userRepository.findByEmailAddress(user.getEmailAddress());
-
-            if (Objects.nonNull(userWithEmailAddress)) {
+            if (this.userRepository.existsByEmailAddress(user.getEmailAddress())) {
                 throw new UserExistValidationException("User with email address already exist");
             }
         }
 
-        User newUser = this.userRepository.save(this.createUserPostBody(user));
-        return newUser;
+        return this.userRepository.save(this.createUserPostBody(user));
     }
 
     private User createUserPostBody(User user) throws UserExistValidationException {
@@ -55,9 +50,7 @@ public class UserService implements UserServiceInterface {
                 .zipCode(user.getAddress().getZipCode()).country(user.getAddress().getCountry()).build();
 
         new User();
-        User newUser = User.builder().firstName(user.getFirstName()).lastName(user.getLastName())
+        return User.builder().firstName(user.getFirstName()).lastName(user.getLastName())
                 .emailAddress(user.getEmailAddress()).phonenumber(user.getPhonenumber()).address(newAddress).build();
-
-        return newUser;
     }
 }
