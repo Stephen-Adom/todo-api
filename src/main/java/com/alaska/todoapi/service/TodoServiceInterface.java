@@ -19,4 +19,7 @@ public interface TodoServiceInterface {
     public Todo getUserTodoById(Long userId, Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException;
 
     public void deleteTodoById(Long userId, Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException;
+
+    public Todo markTodoAsComplete(Long userId, Long todoId)
+            throws UserDoesNotExistException, TodoDoesNotExistException;
 }

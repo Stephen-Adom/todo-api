@@ -85,6 +85,15 @@ public class TodoController {
                 HttpStatus.OK);
     }
 
+    @PostMapping("/user/{userId}/todo/{id}/complete")
+    public ResponseEntity<Map<String, Object>> markTodoAsComplete(@PathVariable("userId") Long userId,
+            @PathVariable("id") Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {
+        Todo todo = this.todoService.markTodoAsComplete(userId, todoId);
+
+        return new ResponseEntity<Map<String, Object>>(this.responseBody.todoResponseBody(HttpStatus.OK, todo),
+                HttpStatus.OK);
+    }
+
     @DeleteMapping("/user/{userId}/todo/{id}/delete")
     public ResponseEntity<Map<String, String>> deleteTodoById(@PathVariable("userId") Long userId,
             @PathVariable("id") Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {

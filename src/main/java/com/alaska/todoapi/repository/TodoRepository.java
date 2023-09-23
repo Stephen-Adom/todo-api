@@ -9,4 +9,6 @@ import com.alaska.todoapi.entity.Todo;
 public interface TodoRepository extends JpaRepository<Todo, Long> {
 
     public List<Todo> findAllByUserId(Long userId);
+
+    public Todo findByIdAndUserId(Long id, Long userId);
 }

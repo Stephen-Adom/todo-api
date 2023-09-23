@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +44,7 @@ public class TodoService implements TodoServiceInterface {
 
     @Override
     public List<Todo> getAllUserTodo(Long id) throws UserDoesNotExistException {
-        if (!this.userRepository.existsById(id)) {
-            throw new UserDoesNotExistException("User with the id " + id + " does not exist");
-        }
+        this.checkIfUserExist(id);
 
         return this.todoRepository.findAllByUserId(id);
     }
@@ -53,54 +52,67 @@ public class TodoService implements TodoServiceInterface {
     @Override
     public Todo updateTodo(Long userId, Long todoId, Todo todo)
             throws UserDoesNotExistException, TodoDoesNotExistException, TodoAlreadyMarkedAsCompletedException {
-        if (!this.userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("User with the id " + userId + " does not exist");
-        }
+        this.checkIfUserExist(userId);
 
-        Optional<Todo> existTodo = this.todoRepository.findById(todoId);
+        Todo existTodo = this.checkIfTodoExist(todoId, userId);
 
-        if (existTodo.isEmpty()) {
-            throw new TodoDoesNotExistException("Todo with id " + todoId + " does not exist");
-        }
-
-        if (existTodo.get().getCompleted()) {
+        if (existTodo.getCompleted()) {
             throw new TodoAlreadyMarkedAsCompletedException("Cannot edit todo already  marked as complete");
         }
 
-        Todo existingTodo = existTodo.get();
+        existTodo.setTitle(todo.getTitle());
+        existTodo.setDescription(todo.getDescription());
+        existTodo.setDueDate(todo.getDueDate());
 
-        existingTodo.setTitle(todo.getTitle());
-        existingTodo.setDescription(todo.getDescription());
-        existingTodo.setDueDate(todo.getDueDate());
-
-        return this.todoRepository.save(existingTodo);
+        return this.todoRepository.save(existTodo);
     }
 
     @Override
     public Todo getUserTodoById(Long userId, Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {
-        if (!this.userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("User with the id " + userId + " does not exist");
-        }
+        this.checkIfUserExist(userId);
 
-        Optional<Todo> existTodo = this.todoRepository.findById(todoId);
+        Todo existTodo = this.checkIfTodoExist(todoId, userId);
+        return existTodo;
+    }
 
-        if (existTodo.isEmpty()) {
-            throw new TodoDoesNotExistException("Todo with id " + todoId + " does not exist");
-        }
+    @Override
+    public Todo markTodoAsComplete(Long userId, Long todoId)
+            throws UserDoesNotExistException, TodoDoesNotExistException {
+        this.checkIfUserExist(userId);
 
-        return existTodo.get();
+        Todo existTodo = this.checkIfTodoExist(todoId, userId);
+
+        existTodo.setCompleted(true);
+
+        return this.todoRepository.save(existTodo);
     }
 
     @Override
     public void deleteTodoById(Long userId, Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {
+        this.checkIfUserExist(userId);
+
+        Todo existTodo = this.checkIfTodoExist(todoId, userId);
+
+        if (Objects.nonNull(existTodo)) {
+
+            this.todoRepository.deleteById(todoId);
+        }
+
+    }
+
+    private void checkIfUserExist(Long userId) throws UserDoesNotExistException {
         if (!this.userRepository.existsById(userId)) {
             throw new UserDoesNotExistException("User with the id " + userId + " does not exist");
         }
+    }
 
-        if (!this.todoRepository.existsById(todoId)) {
-            throw new TodoDoesNotExistException("Todo with id " + todoId + " does not exist");
+    private Todo checkIfTodoExist(Long todoId, Long userId) throws TodoDoesNotExistException {
+        Todo existTodo = this.todoRepository.findByIdAndUserId(todoId, userId);
+
+        if (Objects.isNull(existTodo)) {
+            throw new TodoDoesNotExistException("User with id " + userId + " does not have todo with id " + todoId);
         }
 
-        this.todoRepository.deleteById(todoId);
+        return existTodo;
     }
 }
