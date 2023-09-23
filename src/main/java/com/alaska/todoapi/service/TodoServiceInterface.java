@@ -22,4 +22,6 @@ public interface TodoServiceInterface {
 
     public Todo markTodoAsComplete(Long userId, Long todoId)
             throws UserDoesNotExistException, TodoDoesNotExistException;
+
+    public List<Todo> getCompletedTodoByUserId(Long userId) throws UserDoesNotExistException;
 }

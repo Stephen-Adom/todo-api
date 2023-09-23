@@ -94,6 +94,15 @@ public class TodoController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/user/{userId}/todo/completed")
+    public ResponseEntity<Map<String, Object>> getCompletedTodoByUserId(@PathVariable("userId") Long userId)
+            throws UserDoesNotExistException {
+        List<Todo> allCompletedTodos = this.todoService.getCompletedTodoByUserId(userId);
+
+        return new ResponseEntity<Map<String, Object>>(
+                this.responseBody.todoListResponseBody(HttpStatus.OK, allCompletedTodos), HttpStatus.OK);
+    }
+
     @DeleteMapping("/user/{userId}/todo/{id}/delete")
     public ResponseEntity<Map<String, String>> deleteTodoById(@PathVariable("userId") Long userId,
             @PathVariable("id") Long todoId) throws UserDoesNotExistException, TodoDoesNotExistException {

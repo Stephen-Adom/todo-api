@@ -100,6 +100,13 @@ public class TodoService implements TodoServiceInterface {
 
     }
 
+    @Override
+    public List<Todo> getCompletedTodoByUserId(Long userId) throws UserDoesNotExistException {
+        this.checkIfUserExist(userId);
+
+        return this.todoRepository.findByUserIdAndCompletedTrue(userId);
+    }
+
     private void checkIfUserExist(Long userId) throws UserDoesNotExistException {
         if (!this.userRepository.existsById(userId)) {
             throw new UserDoesNotExistException("User with the id " + userId + " does not exist");
